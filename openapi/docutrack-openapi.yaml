@@ -1,1 +1,92 @@
+openapi: 3.0.3
+info:
+  title: DocuTrack API
+  description: |
+    DocuTrack is a document and workflow tracking REST API.
+
+    This API allows clients to authenticate, manage users, upload documents,
+    and process approval workflows.
+
+    This specification is maintained as part of backend documentation.
+  version: 1.0.0
+
+servers:
+  - url: https://api.docutrack.internal/v1
+    description: Internal API server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: "2026-01-29T10:15:30Z"
+        status:
+          type: integer
+          example: 401
+        error:
+          type: string
+          example: "Unauthorized"
+        message:
+          type: string
+          example: "Invalid or expired JWT token"
+        path:
+          type: string
+          example: "/auth/login"
+
+security:
+  - BearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate user and generate JWT token
+      description: |
+        Authenticates a user using username and password.
+        Returns a JWT access token on successful authentication.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: akshiya@example.com
+                password:
+                  type: string
+                  example: StrongPassword123
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  expiresIn:
+                    type: integer
+                    example: 3600
+        "401":
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
